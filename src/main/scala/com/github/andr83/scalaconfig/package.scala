@@ -7,7 +7,7 @@ import com.typesafe.config.Config
   * created on 15.08.16
   */
 package object scalaconfig {
-  implicit class ScalaConfig(val config: Config) extends AnyVal {
+  implicit class ScalaConfig(val config: Config) extends AnyVal{
     def as[A: DirectReader] = implicitly[DirectReader[A]].read(config)
     def as[A: Reader](path: String) = implicitly[Reader[A]].read(config, path)
   }
