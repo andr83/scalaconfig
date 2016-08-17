@@ -11,6 +11,10 @@ val scalaconfig = project
     crossScalaVersions := Seq("2.10.6", "2.11.0"),
     isSnapshot := version.value.endsWith("-SNAPSHOT"),
     scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),
+    resolvers ++= Seq(
+      Resolver.sonatypeRepo("releases"),
+      Resolver.sonatypeRepo("snapshots")
+    ),
     publishMavenStyle := true,
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
@@ -31,7 +35,8 @@ val scalaconfig = project
     libraryDependencies ++= Seq(
       Library.typesafeConfig % "provided",
       Library.scalaTest % "test",
-      Library.shapeless
+      Library.shapeless,
+      compilerPlugin(Library.scalaMacrosParadise cross CrossVersion.full)
     ),
     pomExtra :=
       <developers>
