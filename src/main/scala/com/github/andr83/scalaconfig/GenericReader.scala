@@ -1,14 +1,11 @@
 package com.github.andr83.scalaconfig
 
-import com.typesafe.config.Config
+import com.typesafe.config._
 import shapeless._
 import shapeless.labelled._
-import shapeless.ops.record._
-import shapeless._ ; import syntax.singleton._ ; import record._
 
 /**
-  * @author andr83 
-  * created on 16.08.16
+  * @author andr83
   */
 trait HReader[L <: HList] {
   def apply(config: Config): L
@@ -26,7 +23,7 @@ object HReader {
   ): HReader[FieldType[K, V] :: T] = new HReader[FieldType[K, V] :: T] {
     override def apply(config: Config): FieldType[K, V] :: T = {
       val key = witness.value.name
-      val value = hr.read(config, key)
+      val value = hr(config, key)
       field[K](value) :: tr(config)
     }
   }
@@ -38,7 +35,7 @@ trait GenericReader {
     gen: LabelledGeneric.Aux[H, T],
     tr: HReader[T]
   ): Reader[H] = new Reader[H] {
-    override def read(config: Config, path: String): H = {
+    def apply(config: Config, path: String): H = {
       gen.from(tr(config.getConfig(path)))
     }
   }
