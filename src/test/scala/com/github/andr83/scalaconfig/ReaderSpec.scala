@@ -3,6 +3,8 @@ package com.github.andr83.scalaconfig
 import com.typesafe.config.{Config, ConfigFactory, ConfigValue, ConfigValueType}
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.concurrent.duration._
+
 /**
   * @author andr83 
   *         created on 15.08.16
@@ -13,6 +15,12 @@ class ReaderSpec extends FlatSpec with Matchers {
     val config = ConfigFactory.parseString(s"stringField = SomeString")
 
     config.as[String]("stringField") should be("SomeString")
+  }
+
+  "String value" should "be read as symbol also" in {
+    val config = ConfigFactory.parseString(s"stringField = SomeString")
+
+    config.as[Symbol]("stringField") should equal('SomeString)
   }
 
   "Int value reader" should "read int" in {
@@ -37,6 +45,19 @@ class ReaderSpec extends FlatSpec with Matchers {
     val config = ConfigFactory.parseString(s"flagField = true")
 
     config.as[Boolean]("flagField") should be(true)
+  }
+
+  "Duration value reader" should "read duration values according HOCON spec" in {
+    val config = ConfigFactory.parseString(
+      """
+        |d10s = 10 seconds
+        |d1m = 1 minute
+        |d12d = 12d
+      """.stripMargin)
+
+    config.as[FiniteDuration]("d10s") should be(10.seconds)
+    config.as[FiniteDuration]("d1m") should be(1.minute)
+    config.as[FiniteDuration]("d12d") should be(12.days)
   }
 
   "ConfigValue value reader" should "read Typesafe ConfigValue" in {

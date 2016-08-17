@@ -6,6 +6,7 @@ import scala.collection.JavaConverters._
 import scala.collection.generic.CanBuildFrom
 import scala.language.higherKinds
 import scala.util.Try
+import scala.concurrent.duration.{FiniteDuration, NANOSECONDS}
 
 /**
   * @author andr83
@@ -13,6 +14,10 @@ import scala.util.Try
 trait DefaultReader {
   implicit val stringReader = new Reader[String] {
     def apply(config: Config, path: String): String = config.getString(path)
+  }
+
+  implicit val symbolReader = new Reader[Symbol] {
+    def apply(config: Config, path: String): Symbol = Symbol(config.getString(path))
   }
 
   implicit val intReader = new Reader[Int] {
@@ -33,6 +38,13 @@ trait DefaultReader {
 
   implicit val booleanReader = new Reader[Boolean] {
     def apply(config: Config, path: String): Boolean = config.getBoolean(path)
+  }
+
+  implicit val finiteDurationReader = new Reader[FiniteDuration] {
+    def apply(config: Config, path: String): FiniteDuration = {
+      val length = config.getDuration(path, java.util.concurrent.TimeUnit.NANOSECONDS)
+      FiniteDuration(length, NANOSECONDS)
+    }
   }
 
   implicit val configValueReader = new Reader[ConfigValue] {
