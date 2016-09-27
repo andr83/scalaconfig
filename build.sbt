@@ -6,7 +6,7 @@ val scalaconfig = project
   .settings(
     organization := "com.github.andr83",
     name := "scalaconfig",
-    version := "0.1-SNAPSHOT",
+    version := "0.1",
     scalaVersion := "2.11.8",
     crossScalaVersions := Seq("2.10.6", "2.11.0"),
     isSnapshot := version.value.endsWith("-SNAPSHOT"),
@@ -38,7 +38,19 @@ val scalaconfig = project
       Library.shapeless,
       compilerPlugin(Library.scalaMacrosParadise cross CrossVersion.full)
     ),
-    pomExtra :=
+    pomExtra := {
+      <url>https://github.com/andr83/scalaconfig</url>
+      <licenses>
+        <license>
+          <name>MIT License</name>
+          <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+      </licenses>
+      <scm>
+        <connection>scm:git:github.com/andr83/scalaconfig</connection>
+        <developerConnection>scm:git:git@github.com/andr83/scalaconfig</developerConnection>
+        <url>github.com/andr83/scalaconfig</url>
+      </scm>
       <developers>
         <developer>
           <id>andr83</id>
@@ -46,4 +58,5 @@ val scalaconfig = project
           <email>andrew.tupitsin@gmail.com</email>
         </developer>
       </developers>
+    }
   )
