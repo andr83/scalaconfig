@@ -42,11 +42,20 @@ val dbConfig3  = config.as[Map[String, AnyRef]]
 
 ## Usage
 
+### Latest release.
+
+```scala
+// for >= Scala 2.10.6, 2.11.x
+libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.1"
+```
+
+### Develop branch.
+
 ```scala
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 // for >= Scala 2.10.6, 2.11.x
-libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.1-SNAPSHOT"
+libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.2-SNAPSHOT"
 ```
 
 ## License
