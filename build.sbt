@@ -8,6 +8,7 @@ val scalaconfig = project
     name := "scalaconfig",
     version := "0.2-SNAPSHOT",
     scalaVersion := "2.11.8",
+    scalacOptions += "-Xlog-implicits",
     crossScalaVersions := Seq("2.10.6", "2.11.0"),
     isSnapshot := version.value.endsWith("-SNAPSHOT"),
     scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),

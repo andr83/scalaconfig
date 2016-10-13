@@ -33,10 +33,10 @@ trait GenericReader {
 
   implicit def genericReader[H, T <: HList](implicit
     gen: LabelledGeneric.Aux[H, T],
-    tr: HReader[T]
+    tr: Lazy[HReader[T]]
   ): Reader[H] = new Reader[H] {
     def apply(config: Config, path: String): H = {
-      gen.from(tr(config.getConfig(path)))
+      gen.from(tr.value(config.getConfig(path)))
     }
   }
 

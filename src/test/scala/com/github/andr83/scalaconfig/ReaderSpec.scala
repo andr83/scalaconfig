@@ -2,6 +2,7 @@ package com.github.andr83.scalaconfig
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigValue, ConfigValueType}
 import org.scalatest.{FlatSpec, Matchers}
+import shapeless.{LabelledGeneric, Generic}
 
 import scala.concurrent.duration._
 
@@ -170,5 +171,23 @@ class ReaderSpec extends FlatSpec with Matchers {
     case class Test(key1: String, key2: Int)
 
     config.as[Test]("test") should be(Test(key1 = "value1", key2 = 42))
+  }
+
+  "Generic reader" should "be able to read nested Case Classes" in {
+    val config = ConfigFactory.parseString(
+      """
+        |test = {
+        |  user = {
+        |    name = user
+        |    password = pswd
+        |  }
+        |}
+      """.stripMargin)
+
+    case class User(name: String, password: String)
+    case class Settings(user: User)
+
+
+    config.as[Settings]("test") should be (Settings(User("user", "pswd")))
   }
 }
