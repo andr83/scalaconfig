@@ -1,6 +1,7 @@
 # scalaconfig
 
 [![Build Status](https://travis-ci.org/andr83/scalaconfig.svg?branch=master)](https://travis-ci.org/andr83/scalaconfig)
+[![codecov](https://codecov.io/gh/andr83/scalaconfig/branch/master/graph/badge.svg)](https://codecov.io/gh/andr83/scalaconfig)
 
 ScalaConfig is a lightweight wrapper over Typesafe Config library provides scala friendly access. 
 It is implemented with type classes pattern and use shapeless for reading case classes.
