@@ -38,6 +38,20 @@ val dbConfig   = config.as[DbConfig]("db")
 val dbConfig2  = config.as[DbConfig] // Direct `config` mapping to case class
 val dbConfig3  = config.as[Map[String, String]]
 val dbConfig3  = config.as[Map[String, AnyRef]]
+
+// Custom reader 
+class User(name: String, password: String)
+
+implicit def userReader: Reader[User] = new Reader[User] {
+  override def apply(config: Config, path: String): User = {
+    val userConfig = config.getConfig(path)
+    new User(
+      user = userConfig.as[String]("name"),
+      password = userConfig.as[String]("password")
+    )
+  }
+}
+
 ```
 
 ## Usage
