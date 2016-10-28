@@ -1,5 +1,7 @@
 package com.github.andr83.scalaconfig
 
+import java.util.Properties
+
 import com.typesafe.config.{Config, ConfigFactory, ConfigValue, ConfigValueType}
 import org.scalatest.{FlatSpec, Matchers}
 import shapeless.{LabelledGeneric, Generic}
@@ -158,6 +160,21 @@ class ReaderSpec extends FlatSpec with Matchers {
       """.stripMargin)
 
     config.as[Map[String, AnyRef]] should be(Map("key1" -> "value1", "key2" -> 42))
+  }
+
+  "Config object" should "be able to convert java Properties" in {
+    val config = ConfigFactory.parseString(
+      """
+        |{
+        |  key1 = value1
+        |  key2 = 42
+        |}
+      """.stripMargin)
+
+    val expected = new Properties()
+    expected.put("key1", "value1")
+    expected.put("key2", Int.box(42))
+    config.as[Properties] should be (expected)
   }
 
   "Config object" should "be able to be converted to Case Class instance" in {
