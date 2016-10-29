@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/andr83/scalaconfig.svg?branch=master)](https://travis-ci.org/andr83/scalaconfig)
 [![codecov](https://codecov.io/gh/andr83/scalaconfig/branch/master/graph/badge.svg)](https://codecov.io/gh/andr83/scalaconfig)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.andr83/scalaconfig_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.andr83/scalaconfig_2.11)
 
 ScalaConfig is a lightweight wrapper over Typesafe Config library provides scala friendly access. 
 It is implemented with type classes pattern and use shapeless for reading case classes.
