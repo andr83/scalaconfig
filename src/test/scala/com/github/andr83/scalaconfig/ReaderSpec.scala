@@ -38,6 +38,12 @@ class ReaderSpec extends FlatSpec with Matchers {
     config.as[Long]("longField") should be(42)
   }
 
+  "Float value reader" should "read float" in {
+    val config = ConfigFactory.parseString(s"floatField = 42.6")
+
+    config.as[Float]("floatField") should be(42.6.toFloat)
+  }
+
   "Double value reader" should "read double" in {
     val config = ConfigFactory.parseString(s"doubleField = 42.6")
 
