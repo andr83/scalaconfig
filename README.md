@@ -61,8 +61,8 @@ implicit def userReader: Reader[User] = new Reader[User] {
 ### Latest release.
 
 ```scala
-// for >= Scala 2.10.6, 2.11.x
-libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.2"
+// for >= Scala 2.10.6, 2.11.x, 2.12.x
+libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.3"
 ```
 
 ### Develop branch.
@@ -70,8 +70,8 @@ libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.2"
 ```scala
 resolvers += Resolver.sonatypeRepo("snapshots")
 
-// for >= Scala 2.10.6, 2.11.x
-libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.3-SNAPSHOT"
+// for >= Scala 2.10.6, 2.11.x, 2.12.x
+libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.4-SNAPSHOT"
 ```
 
 ## License
