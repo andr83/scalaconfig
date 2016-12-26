@@ -5,7 +5,6 @@ import java.util.Properties
 import com.typesafe.config.{Config, ConfigValue}
 
 import scala.collection.JavaConverters._
-import scala.collection.JavaConversions._
 import scala.collection.generic.CanBuildFrom
 import scala.language.higherKinds
 import scala.util.Try
@@ -97,7 +96,7 @@ trait DefaultReader {
     override def apply(config: Config, path: String): Properties = {
       val props = new Properties()
       val map = mapStringAnyReader(config, path)
-      props.putAll(map)
+      props.putAll(map.asJava)
       props
     }
   }

@@ -2,8 +2,8 @@ import sbt._
 
 
 object Version {
-  val typesafeConfig = "1.2.1"
-  val scalaTest = "2.2.+"
+  val typesafeConfig = "1.3.1"
+  val scalaTest = "3.0.1"
   val shapeless = "2.3.2"
   val scalaMacrosParadise = "2.1.0"
 }
