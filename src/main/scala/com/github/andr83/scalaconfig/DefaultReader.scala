@@ -79,9 +79,10 @@ trait DefaultReader {
     def apply(config: Config, path: String): Map[String, A] = {
       val reader = implicitly[Reader[A]]
       val obj = config.getConfig(path)
-      obj.root().keySet().asScala.map(k =>
-        k -> reader(obj, k)
-      ).toMap
+      obj.root().entrySet().asScala.map(e => {
+        val entryConfig = e.getValue.atPath(FakePath)
+        e.getKey -> reader(entryConfig, FakePath)
+      }).toMap
     }
   }
 

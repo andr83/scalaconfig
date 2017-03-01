@@ -144,6 +144,18 @@ class ReaderSpec extends FlatSpec with Matchers {
     config.as[Map[String, String]]("parent.mapField") should be(Map("key1" -> "value1", "key2" -> "value2"))
   }
 
+  "Map reader" should "return Map[String, A] also for keys with dots" in {
+    val config = ConfigFactory.parseString(
+      """
+        |mapField = {
+        |  "10.11" = value1
+        |  "12.13" = value2
+        |}
+      """.stripMargin)
+
+    config.as[Map[String, String]]("mapField") should be(Map("10.11" -> "value1", "12.13" -> "value2"))
+  }
+
   "Config object" should "be directly convert to Map" in {
     val config = ConfigFactory.parseString(
       """
