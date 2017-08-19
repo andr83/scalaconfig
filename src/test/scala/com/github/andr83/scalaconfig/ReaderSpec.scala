@@ -237,4 +237,22 @@ class ReaderSpec extends FlatSpec with Matchers {
     c.key1 should be ("value1")
     c.key2 should be (Some(42)) // the default value of the case class should be Some(42) and not None
   }
+
+  "Custom reader" should "be used" in {
+    val config = ConfigFactory.parseString(
+      """
+        |test = [user, 123]
+      """.stripMargin)
+
+    case class Test(key1: String, key2: Int)
+
+    implicit val testReader = new Reader[Test] {
+      def apply(config: Config, path: String): Test = {
+        val list = config.getList(path)
+        Test(list.get(0).unwrapped().asInstanceOf[String], list.get(1).unwrapped().asInstanceOf[Int])
+      }
+    }
+
+    config.as[Test]("test") should be(Test(key1 = "user", key2 = 123))
+  }
 }
