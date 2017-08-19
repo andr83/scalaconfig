@@ -4,7 +4,6 @@ import java.util.Properties
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigValue, ConfigValueType}
 import org.scalatest.{FlatSpec, Matchers}
-import shapeless.{LabelledGeneric, Generic}
 
 import scala.concurrent.duration._
 
@@ -224,5 +223,18 @@ class ReaderSpec extends FlatSpec with Matchers {
 
 
     config.as[Settings]("test") should be (Settings(User("user", "pswd")))
+  }
+
+  "Case class with default Option value to Some(...)" should "be correctly instantiated" in {
+    val config = ConfigFactory.parseString(
+      """
+        |test = {
+        |  key1 = value1
+        |}
+      """.stripMargin)
+    case class Test(key1: String, key2: Option[Int] = Some(42) )
+    val c = config.as[Test]("test")
+    c.key1 should be ("value1")
+    c.key2 should be (Some(42)) // the default value of the case class should be Some(42) and not None
   }
 }
