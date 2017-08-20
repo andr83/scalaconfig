@@ -9,99 +9,98 @@ import scala.collection.JavaConverters._
 import scala.collection.generic.CanBuildFrom
 import scala.concurrent.duration.{FiniteDuration, NANOSECONDS}
 import scala.language.higherKinds
-import scala.util.Try
 
 /**
   * @author andr83
   */
 trait DefaultReader {
-  implicit val stringReader = new Reader[String] {
-    def apply(config: Config, path: String): String = config.getString(path)
-  }
+  implicit val stringReader: Reader[String] = Reader.pure((config: Config, path: String) => config.getString(path))
 
-  implicit val symbolReader = new Reader[Symbol] {
-    def apply(config: Config, path: String): Symbol = Symbol(config.getString(path))
-  }
+  implicit val symbolReader: Reader[Symbol] = Reader.pure((config: Config, path: String) => Symbol(config.getString(path)))
 
-  implicit val intReader = new Reader[Int] {
-    def apply(config: Config, path: String): Int = config.getInt(path)
-  }
+  implicit val intReader: Reader[Int] = Reader.pure((config: Config, path: String) => config.getInt(path))
 
-  implicit val longReader = new Reader[Long] {
-    def apply(config: Config, path: String): Long = config.getLong(path)
-  }
+  implicit val longReader: Reader[Long] = Reader.pure((config: Config, path: String) => config.getLong(path))
 
-  implicit val floatReader = new Reader[Float] {
-    def apply(config: Config, path: String): Float = config.getNumber(path).floatValue()
-  }
+  implicit val floatReader: Reader[Float] = Reader.pure((config: Config, path: String) => config.getNumber(path).floatValue())
 
-  implicit val doubleReader = new Reader[Double] {
-    def apply(config: Config, path: String): Double = config.getDouble(path)
-  }
+  implicit val doubleReader: Reader[Double] = Reader.pure((config: Config, path: String) => config.getDouble(path))
 
-  implicit val booleanReader = new Reader[Boolean] {
-    def apply(config: Config, path: String): Boolean = config.getBoolean(path)
-  }
+  implicit val booleanReader: Reader[Boolean] = Reader.pure((config: Config, path: String) => config.getBoolean(path))
 
-  implicit val finiteDurationReader = new Reader[FiniteDuration] {
-    def apply(config: Config, path: String): FiniteDuration = {
-      val length = config.getDuration(path, java.util.concurrent.TimeUnit.NANOSECONDS)
-      FiniteDuration(length, NANOSECONDS)
+  implicit val finiteDurationReader: Reader[FiniteDuration] = Reader.pure((config: Config, path: String) => {
+    val length = config.getDuration(path, java.util.concurrent.TimeUnit.NANOSECONDS)
+    FiniteDuration(length, NANOSECONDS)
+  })
+
+  implicit val configValueReader: Reader[ConfigValue] = Reader.pure((config: Config, path: String) => config.getValue(path))
+
+  implicit val configReader: Reader[Config] = Reader.pure((config: Config, path: String) => config.getConfig(path))
+
+  implicit def optReader[A: Reader]: Reader[Option[A]] = Reader.pureV((config: Config, path: String) => {
+    if (config.hasPath(path)) {
+      implicitly[Reader[A]].apply(config, path) match {
+        case Right(a) => Right(Some(a))
+        case Left(errors) => Left(errors)
+      }
+    } else {
+      Right(None)
     }
-  }
+  })
 
-  implicit val configValueReader = new Reader[ConfigValue] {
-    def apply(config: Config, path: String): ConfigValue = config.getValue(path)
-  }
+  implicit def traversableReader[A: Reader, C[_]](implicit cbf: CanBuildFrom[Nothing, A, C[A]]): Reader[C[A]] = Reader.pureV((config: Config, path: String) => {
+    val reader = implicitly[Reader[A]]
+    val list = config.getList(path).asScala
 
-  implicit val configReader = new Reader[Config] {
-    def apply(config: Config, path: String): Config = config.getConfig(path)
-  }
+    val (errors, res) = list map (item => {
+      val entryConfig = item.atPath(FakePath)
+      reader(entryConfig, FakePath)
+    }) partition (_.isLeft)
 
-  implicit def optReader[A: Reader] = new Reader[Option[A]] {
-    def apply(config: Config, path: String): Option[A] = Try(implicitly[Reader[A]].apply(config, path)).toOption
-  }
-
-  implicit def traversableReader[A: Reader, C[_]](implicit cbf: CanBuildFrom[Nothing, A, C[A]]) = new Reader[C[A]] {
-    def apply(config: Config, path: String): C[A] = {
-      val reader = implicitly[Reader[A]]
-      val list = config.getList(path).asScala
+    if (errors.nonEmpty) {
+      Left(errors.flatMap(_.left.get))
+    } else {
       val builder = cbf()
       builder.sizeHint(list.size)
-      list foreach (item => {
-        val entryConfig = item.atPath(FakePath)
-        builder += reader(entryConfig, FakePath)
-      })
-      builder.result()
+      res.foreach {
+        case Right(a) => builder += a
+        case _ =>
+      }
+      Right(builder.result())
     }
-  }
+  })
 
-  implicit def mapReader[A: Reader] = new Reader[Map[String, A]] {
-    def apply(config: Config, path: String): Map[String, A] = {
-      val reader = implicitly[Reader[A]]
-      val obj = config.getConfig(path)
-      obj.root().entrySet().asScala.map(e => {
-        val entryConfig = e.getValue.atPath(FakePath)
-        e.getKey -> reader(entryConfig, FakePath)
-      }).toMap
+  implicit def mapReader[A: Reader]: Reader[Map[String, A]] = Reader.pureV((config: Config, path: String) => {
+    val reader = implicitly[Reader[A]]
+    val obj = config.getConfig(path)
+    val (errors, res) = obj.root().entrySet().asScala.map(e => {
+      val entryConfig = e.getValue.atPath(FakePath)
+      e.getKey -> reader(entryConfig, FakePath)
+    }).partition(_._2.isLeft)
+    if (errors.nonEmpty) {
+      Left(errors.flatMap(_._2.left.get).toSeq)
+    } else {
+      Right(res.map {
+        case (k, Right(a)) => k -> a
+        case _ => throw new IllegalStateException
+      }.toMap)
     }
-  }
+  })
 
-  implicit val mapStringAnyReader = new Reader[Map[String, AnyRef]] {
-    def apply(config: Config, path: String): Map[String, AnyRef] = {
-      val obj = config.getConfig(path)
-      obj.root().unwrapped().asScala.toMap
-    }
-  }
+  implicit val mapStringAnyReader: Reader[Map[String, AnyRef]] = Reader.pure((config: Config, path: String) => {
+    val obj = config.getConfig(path)
+    obj.root().unwrapped().asScala.toMap
+  })
 
-  implicit val propertiesReader = new Reader[Properties] {
-    override def apply(config: Config, path: String): Properties = {
-      val props = new Properties()
-      val map = mapStringAnyReader(config, path)
-      props.putAll(map.asJava)
-      props
+  implicit val propertiesReader: Reader[Properties] = Reader.pureV((config: Config, path: String) => {
+    mapStringAnyReader(config, path) match {
+      case Right(map) =>
+        val props = new Properties()
+        props.putAll(map.asJava)
+        Right(props)
+      case Left(errors) => Left(errors)
     }
-  }
+  })
 }
 
 object DefaultReader extends DefaultReader

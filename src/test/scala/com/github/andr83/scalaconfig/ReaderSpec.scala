@@ -3,56 +3,55 @@ package com.github.andr83.scalaconfig
 import java.util.Properties
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigValue, ConfigValueType}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.{FlatSpec, Inside, Matchers}
 
 import scala.concurrent.duration._
 
 /**
-  * @author andr83 
-  *         created on 15.08.16
+  * @author andr83
   */
-class ReaderSpec extends FlatSpec with Matchers {
+class ReaderSpec extends FlatSpec with Matchers with Inside {
 
   "String value reader" should "read string" in {
     val config = ConfigFactory.parseString(s"stringField = SomeString")
 
-    config.as[String]("stringField") should be("SomeString")
+    config.asUnsafe[String]("stringField") should be("SomeString")
   }
 
   "String value" should "be read as symbol also" in {
     val config = ConfigFactory.parseString(s"stringField = SomeString")
 
-    config.as[Symbol]("stringField") should equal('SomeString)
+    config.asUnsafe[Symbol]("stringField") should equal('SomeString)
   }
 
   "Int value reader" should "read int" in {
     val config = ConfigFactory.parseString(s"intField = 42")
 
-    config.as[Int]("intField") should be(42)
+    config.asUnsafe[Int]("intField") should be(42)
   }
 
   "Long value reader" should "read long" in {
     val config = ConfigFactory.parseString(s"longField = 42")
 
-    config.as[Long]("longField") should be(42)
+    config.asUnsafe[Long]("longField") should be(42)
   }
 
   "Float value reader" should "read float" in {
     val config = ConfigFactory.parseString(s"floatField = 42.6")
 
-    config.as[Float]("floatField") should be(42.6f)
+    config.asUnsafe[Float]("floatField") should be(42.6f)
   }
 
   "Double value reader" should "read double" in {
     val config = ConfigFactory.parseString(s"doubleField = 42.6")
 
-    config.as[Double]("doubleField") should be(42.6)
+    config.asUnsafe[Double]("doubleField") should be(42.6)
   }
 
   "Boolean value reader" should "read boolean" in {
     val config = ConfigFactory.parseString(s"flagField = true")
 
-    config.as[Boolean]("flagField") should be(true)
+    config.asUnsafe[Boolean]("flagField") should be(true)
   }
 
   "Duration value reader" should "read duration values according HOCON spec" in {
@@ -63,15 +62,15 @@ class ReaderSpec extends FlatSpec with Matchers {
         |d12d = 12d
       """.stripMargin)
 
-    config.as[FiniteDuration]("d10s") should be(10.seconds)
-    config.as[FiniteDuration]("d1m") should be(1.minute)
-    config.as[FiniteDuration]("d12d") should be(12.days)
+    config.asUnsafe[FiniteDuration]("d10s") should be(10.seconds)
+    config.asUnsafe[FiniteDuration]("d1m") should be(1.minute)
+    config.asUnsafe[FiniteDuration]("d12d") should be(12.days)
   }
 
   "ConfigValue value reader" should "read Typesafe ConfigValue" in {
     val config = ConfigFactory.parseString(s"someField = someValue")
 
-    val configValue = config.as[ConfigValue]("someField")
+    val configValue = config.asUnsafe[ConfigValue]("someField")
     configValue.valueType() should be(ConfigValueType.STRING)
     configValue.unwrapped() should be("someValue")
   }
@@ -89,14 +88,14 @@ class ReaderSpec extends FlatSpec with Matchers {
          |innerConfig = $innerConfigStr
       """.stripMargin)
 
-    config.as[Config]("innerConfig") should be(ConfigFactory.parseString(innerConfigStr))
+    config.asUnsafe[Config]("innerConfig") should be(ConfigFactory.parseString(innerConfigStr))
   }
 
   "Option value reader" should "wrap existing value in a Some or return a None" in {
     val config = ConfigFactory.parseString(s"stringField = SomeString")
 
-    config.as[Option[String]]("stringField") should be(Some("SomeString"))
-    config.as[Option[String]]("emptyField") should be(None)
+    config.asUnsafe[Option[String]]("stringField") should be(Some("SomeString"))
+    config.asUnsafe[Option[String]]("emptyField") should be(None)
   }
 
   "Traversable reader" should "return any collection which have s CanBuildFrom instance " in {
@@ -106,15 +105,15 @@ class ReaderSpec extends FlatSpec with Matchers {
         |intItems: [1,2,3]
       """.stripMargin)
 
-    config.as[Seq[String]]("stringItems") should be(Seq("a", "b", "c"))
-    config.as[List[String]]("stringItems") should be(List("a", "b", "c"))
-    config.as[Array[String]]("stringItems") should be(Array("a", "b", "c"))
+    config.asUnsafe[Seq[String]]("stringItems") should be(Seq("a", "b", "c"))
+    config.asUnsafe[List[String]]("stringItems") should be(List("a", "b", "c"))
+    config.asUnsafe[Array[String]]("stringItems") should be(Array("a", "b", "c"))
 
-    config.as[Seq[Option[String]]]("stringItems") should be(Seq(Some("a"), Some("b"), Some("c")))
+    config.asUnsafe[Seq[Option[String]]]("stringItems") should be(Seq(Some("a"), Some("b"), Some("c")))
 
-    config.as[Seq[Int]]("intItems") should be(Seq(1, 2, 3))
-    config.as[List[Int]]("intItems") should be(List(1, 2, 3))
-    config.as[Array[Int]]("intItems") should be(Array(1, 2, 3))
+    config.asUnsafe[Seq[Int]]("intItems") should be(Seq(1, 2, 3))
+    config.asUnsafe[List[Int]]("intItems") should be(List(1, 2, 3))
+    config.asUnsafe[Array[Int]]("intItems") should be(Array(1, 2, 3))
   }
 
   "Map reader" should "return Map[String, A]" in {
@@ -126,7 +125,7 @@ class ReaderSpec extends FlatSpec with Matchers {
         |}
       """.stripMargin)
 
-    config.as[Map[String, String]]("mapField") should be(Map("key1" -> "value1", "key2" -> "value2"))
+    config.asUnsafe[Map[String, String]]("mapField") should be(Map("key1" -> "value1", "key2" -> "value2"))
   }
 
   "Map reader" should "return also nested value" in {
@@ -140,7 +139,7 @@ class ReaderSpec extends FlatSpec with Matchers {
         |}
       """.stripMargin)
 
-    config.as[Map[String, String]]("parent.mapField") should be(Map("key1" -> "value1", "key2" -> "value2"))
+    config.asUnsafe[Map[String, String]]("parent.mapField") should be(Map("key1" -> "value1", "key2" -> "value2"))
   }
 
   "Map reader" should "return Map[String, A] also for keys with dots" in {
@@ -164,7 +163,7 @@ class ReaderSpec extends FlatSpec with Matchers {
         |}
       """.stripMargin)
 
-    config.as[Map[String, String]] should be(Map("key1" -> "value1", "key2" -> "value2"))
+    config.asUnsafe[Map[String, String]] should be(Map("key1" -> "value1", "key2" -> "value2"))
   }
 
   "Config object" should "be able to convert to Map[String, AnyRef]" in {
@@ -176,7 +175,7 @@ class ReaderSpec extends FlatSpec with Matchers {
         |}
       """.stripMargin)
 
-    config.as[Map[String, AnyRef]] should be(Map("key1" -> "value1", "key2" -> 42))
+    config.asUnsafe[Map[String, AnyRef]] should be(Map("key1" -> "value1", "key2" -> 42))
   }
 
   "Config object" should "be able to convert java Properties" in {
@@ -191,7 +190,7 @@ class ReaderSpec extends FlatSpec with Matchers {
     val expected = new Properties()
     expected.put("key1", "value1")
     expected.put("key2", Int.box(42))
-    config.as[Properties] should be (expected)
+    config.asUnsafe[Properties] should be (expected)
   }
 
   "Config object" should "be able to be converted to Case Class instance" in {
@@ -204,7 +203,7 @@ class ReaderSpec extends FlatSpec with Matchers {
       """.stripMargin)
     case class Test(key1: String, key2: Int)
 
-    config.as[Test]("test") should be(Test(key1 = "value1", key2 = 42))
+    config.asUnsafe[Test]("test") should be(Test(key1 = "value1", key2 = 42))
   }
 
   "Generic reader" should "be able to read nested Case Classes" in {
@@ -222,7 +221,7 @@ class ReaderSpec extends FlatSpec with Matchers {
     case class Settings(user: User)
 
 
-    config.as[Settings]("test") should be (Settings(User("user", "pswd")))
+    config.asUnsafe[Settings]("test") should be (Settings(User("user", "pswd")))
   }
 
   "Case class with default Option value to Some(...)" should "be correctly instantiated" in {
@@ -233,7 +232,7 @@ class ReaderSpec extends FlatSpec with Matchers {
         |}
       """.stripMargin)
     case class Test(key1: String, key2: Option[Int] = Some(42) )
-    val c = config.as[Test]("test")
+    val c = config.asUnsafe[Test]("test")
     c.key1 should be ("value1")
     c.key2 should be (Some(42)) // the default value of the case class should be Some(42) and not None
   }
@@ -246,13 +245,27 @@ class ReaderSpec extends FlatSpec with Matchers {
 
     case class Test(key1: String, key2: Int)
 
-    implicit val testReader = new Reader[Test] {
-      def apply(config: Config, path: String): Test = {
-        val list = config.getList(path)
-        Test(list.get(0).unwrapped().asInstanceOf[String], list.get(1).unwrapped().asInstanceOf[Int])
-      }
-    }
+    implicit val testReader = Reader.pure[Test]((config: Config, path: String) => {
+      val list = config.getList(path)
+      Test(list.get(0).unwrapped().asInstanceOf[String], list.get(1).unwrapped().asInstanceOf[Int])
+    })
 
-    config.as[Test]("test") should be(Test(key1 = "user", key2 = 123))
+    config.asUnsafe[Test]("test") should be(Test(key1 = "user", key2 = 123))
+  }
+
+  "Reader" should "return all errors" in {
+    val config = ConfigFactory.parseString(
+      """
+        |test = {
+        |  key1 = value1
+        |  key2 = value2
+        |}
+      """.stripMargin)
+    case class Test(key1: Int, key2: Option[Float] = Some(42f))
+
+    val res = config.as[Test]("test")
+    inside(res) {
+      case Left(errors) => errors should have size 2
+    }
   }
 }
