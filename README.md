@@ -11,10 +11,10 @@ It is implemented with type classes pattern and use shapeless for reading case c
 
 ScalaConfig adds additional metods:
 
-* `as[A](path)` - return Either[Seq[Throwable], A] by path in config object
-* `as[A]` - convert config object to Either[Seq[Throwable], A]
-* `asUnsafe[A](path)` - return value of type A by path in config object. On fail a first exception will thrown.
-* `asUnsafe[A]` - convert config object to value of type A. On fail a first exception will thrown.
+* `as[A](path)` - return `Either[Seq[Throwable], A]` by path in config object
+* `as[A]` - convert config object to `Either[Seq[Throwable], A]`
+* `asUnsafe[A](path)` - return value of type `A` by path in config object. On fail a first exception will thrown.
+* `asUnsafe[A]` - convert config object to value of type `A`. On fail a first exception will thrown.
 
 ## Supported types
 
