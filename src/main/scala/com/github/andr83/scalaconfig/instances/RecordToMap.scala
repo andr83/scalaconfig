@@ -1,8 +1,9 @@
-package com.github.andr83.scalaconfig.util
+package com.github.andr83.scalaconfig.instances
+
+import shapeless.labelled.FieldType
+import shapeless.{::, HList, HNil, Witness}
 
 import scala.collection.immutable.Map
-import shapeless.{ ::, HList, HNil, Witness }
-import shapeless.labelled.FieldType
 
 abstract class RecordToMap[R <: HList] {
   def apply(r: R): Map[String, Any]

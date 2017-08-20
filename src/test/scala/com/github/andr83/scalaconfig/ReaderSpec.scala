@@ -40,7 +40,7 @@ class ReaderSpec extends FlatSpec with Matchers {
   "Float value reader" should "read float" in {
     val config = ConfigFactory.parseString(s"floatField = 42.6")
 
-    config.as[Float]("floatField") should be(42.6.toFloat)
+    config.as[Float]("floatField") should be(42.6f)
   }
 
   "Double value reader" should "read double" in {

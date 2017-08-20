@@ -1,14 +1,15 @@
-package com.github.andr83.scalaconfig
+package com.github.andr83.scalaconfig.instances
 
 import java.util.Properties
 
+import com.github.andr83.scalaconfig.{FakePath, Reader}
 import com.typesafe.config.{Config, ConfigValue}
 
 import scala.collection.JavaConverters._
 import scala.collection.generic.CanBuildFrom
+import scala.concurrent.duration.{FiniteDuration, NANOSECONDS}
 import scala.language.higherKinds
 import scala.util.Try
-import scala.concurrent.duration.{FiniteDuration, NANOSECONDS}
 
 /**
   * @author andr83
@@ -54,7 +55,7 @@ trait DefaultReader {
   }
 
   implicit val configReader = new Reader[Config] {
-    def apply(config: Config, path: String) = config.getConfig(path)
+    def apply(config: Config, path: String): Config = config.getConfig(path)
   }
 
   implicit def optReader[A: Reader] = new Reader[Option[A]] {

@@ -1,6 +1,6 @@
-package com.github.andr83.scalaconfig
+package com.github.andr83.scalaconfig.instances
 
-import com.github.andr83.scalaconfig.util.RecordToMap
+import com.github.andr83.scalaconfig.Reader
 import com.typesafe.config._
 import shapeless._
 import shapeless.labelled._

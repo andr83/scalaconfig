@@ -11,4 +11,4 @@ trait Reader[A] {
   def apply(config: Config, path: String): A
 }
 
-object Reader extends DefaultReader with GenericReader
+object Reader
