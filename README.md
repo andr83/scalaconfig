@@ -63,7 +63,7 @@ implicit def userReader: Reader[User] = Reader.pureV((config: Config, path: Stri
     val userConfig = config.getConfig(path)
     
     val userE = userConfig.as[String]("name")
-    val passwordE = userConfig.asUnsafe[String]("password")
+    val passwordE = userConfig.as[String]("password")
     
     // with Cats or Scalaz it can be of course more elegant!
     (userE, passwordE)  match {
