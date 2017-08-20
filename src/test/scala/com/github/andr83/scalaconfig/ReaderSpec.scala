@@ -151,7 +151,7 @@ class ReaderSpec extends FlatSpec with Matchers with Inside {
         |}
       """.stripMargin)
 
-    config.as[Map[String, String]]("mapField") should be(Map("10.11" -> "value1", "12.13" -> "value2"))
+    config.asUnsafe[Map[String, String]]("mapField") should be(Map("10.11" -> "value1", "12.13" -> "value2"))
   }
 
   "Config object" should "be directly convert to Map" in {
