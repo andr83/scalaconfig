@@ -6,7 +6,7 @@ val scalaconfig = project
   .settings(
     organization := "com.github.andr83",
     name := "scalaconfig",
-    version := "0.4",
+    version := "0.5-SNAPSHOT",
     scalaVersion := "2.11.8",
     scalacOptions += "-Xlog-implicits",
     crossScalaVersions := Seq("2.10.6", "2.11.0", "2.12.0"),
