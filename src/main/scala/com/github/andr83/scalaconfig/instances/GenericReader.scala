@@ -30,7 +30,7 @@ object HReader {
         defaults
           .get(key)
           .map(v=> Right(v.asInstanceOf[V]))
-          .getOrElse(Left(Seq(new ConfigException.BadPath(config.origin(), s"Can not find $key path to build generic instance"))))
+          .getOrElse(hr(config, key)) //trying to resolve non existing key in reader, e.g. for Option
       }
       val trRes = tr(config, defaults)
 

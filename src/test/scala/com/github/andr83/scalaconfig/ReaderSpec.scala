@@ -237,6 +237,19 @@ class ReaderSpec extends FlatSpec with Matchers with Inside {
     c.key2 should be (Some(42)) // the default value of the case class should be Some(42) and not None
   }
 
+  "Option value in Case class" should "map to None" in {
+    val config = ConfigFactory.parseString(
+      """
+        |test = {
+        |  key1 = value1
+        |}
+      """.stripMargin)
+    case class Test(key1: String, key2: Option[Int])
+    val c = config.asUnsafe[Test]("test")
+    c.key1 should be ("value1")
+    c.key2 should be (None)
+  }
+
   "Custom reader" should "be used" in {
     val config = ConfigFactory.parseString(
       """
