@@ -76,6 +76,8 @@ implicit def userReader: Reader[User] = Reader.pureV((config: Config, path: Stri
 })
 
 ```
+### Implementation details
+https://andr83.io/en/1384/
 
 ## Usage
 
