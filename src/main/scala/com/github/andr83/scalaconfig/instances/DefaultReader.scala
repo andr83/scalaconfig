@@ -73,9 +73,9 @@ trait DefaultReader {
   implicit def mapReader[A: Reader]: Reader[Map[String, A]] = Reader.pureV((config: Config, path: String) => {
     val reader = implicitly[Reader[A]]
     val obj = config.getConfig(path)
-    val (errors, res) = obj.root().entrySet().asScala.map(e => {
+    val (errors, res) = obj.entrySet().asScala.map(e => {
       val entryConfig = e.getValue.atPath(FakePath)
-      e.getKey -> reader(entryConfig, FakePath)
+      e.getKey.stripPrefix("\"").stripSuffix("\"") -> reader(entryConfig, FakePath)
     }).partition(_._2.isLeft)
     if (errors.nonEmpty) {
       Left(errors.flatMap(_._2.left.get).toSeq)
