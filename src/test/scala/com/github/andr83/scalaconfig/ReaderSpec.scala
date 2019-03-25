@@ -194,6 +194,21 @@ class ReaderSpec extends FlatSpec with Matchers with Inside {
     config.asUnsafe[Properties] should be (expected)
   }
 
+  "Value classes" should "read raw value" in {
+    val config = ConfigFactory.parseString(
+      """
+        |{
+        |  key1 = value1
+        |  key2 = 42
+        |}
+      """.stripMargin)
+
+    case class Foo(key1: StringValue, key2: IntValue)
+
+    config.asUnsafe[IntValue]("key2") shouldBe IntValue(42)
+    config.asUnsafe[StringValue]("key1") shouldBe StringValue("value1")
+  }
+
   "Config object" should "be able to be converted to Case Class instance" in {
     val config = ConfigFactory.parseString(
       """
@@ -283,3 +298,6 @@ class ReaderSpec extends FlatSpec with Matchers with Inside {
     }
   }
 }
+
+case class StringValue(value: String) extends AnyVal
+case class IntValue(value: Int) extends AnyVal

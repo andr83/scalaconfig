@@ -96,7 +96,7 @@ trait DefaultReader {
     mapStringAnyReader(config, path) match {
       case Right(map) =>
         val props = new Properties()
-        props.putAll(map.asJava)
+        map.foreach { case (k, v)=> props.put(k, v)}
         Right(props)
       case Left(errors) => Left(errors)
     }
