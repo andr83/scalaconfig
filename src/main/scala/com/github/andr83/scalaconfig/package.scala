@@ -6,7 +6,7 @@ import com.typesafe.config.Config
 /**
   * @author andr83
   */
-package object scalaconfig extends DefaultReader with GenericReader {
+package object scalaconfig extends GenericReader with DefaultReader {
   private[scalaconfig] val FakePath: String = "fakePath"
 
   implicit class ScalaConfig(val config: Config) extends AnyVal {
