@@ -142,7 +142,7 @@ class ReaderSpec extends FlatSpec with Matchers with Inside {
     config.asUnsafe[Map[String, String]]("parent.mapField") should be(Map("key1" -> "value1", "key2" -> "value2"))
   }
 
-  "Map reader" should "return Map[String, A] also for keys with dots" in {
+  "Map reader" should "return Map[String, String] also for keys with dots" in {
     val config = ConfigFactory.parseString(
       """
         |mapField = {
@@ -153,6 +153,104 @@ class ReaderSpec extends FlatSpec with Matchers with Inside {
       """.stripMargin)
 
     config.asUnsafe[Map[String, String]]("mapField") should be(Map("10.11" -> "value1", "12.13" -> "value2", "key3.subkey" -> "value3"))
+  }
+
+  // TODO support for collapsed maps with objects
+  "Map reader" should "return Map[String, A] also for keys with dots" ignore {
+    val config = ConfigFactory.parseString(
+      """
+        |mapField = {
+        |  "10.11" = {
+        |    key1 = value1
+        |    key2 = 11
+        |  }
+        |  "12.13" = {
+        |    key1 = value2
+        |    key2 = 22
+        |  }
+        |  key3.subkey = {
+        |    key1 = value3
+        |    key2 = 33
+        |  }
+        |}
+      """.stripMargin)
+
+    case class Test(key1: String, key2: Int)
+    val t1 = Test("value1", 11)
+    val t2 = Test("value2", 22)
+    val t3 = Test("value3", 33)
+
+    config.asUnsafe[Map[String, Test]]("mapField") should be(Map("10.11" -> t1, "12.13" -> t2, "key3.subkey" -> t3))
+  }
+
+  "Map reader" should "be able to read nested collapsed Map with Strings" in {
+    val config = ConfigFactory.parseString(
+      """
+        |users = {
+        |  user1 {
+        |    key11.subkey1 = value1
+        |    key12.subkey2 = value2
+        |  }
+        |  user2 {
+        |    key21.subkey1 = value1
+        |    key22.subkey2 = value2
+        |  }
+        |}
+      """.stripMargin)
+
+    val user1 = Map("key11.subkey1" -> "value1", "key12.subkey2" -> "value2")
+    val user2 = Map("key21.subkey1" -> "value1", "key22.subkey2" -> "value2")
+
+    type Users = Map[String, Map[String, String]]
+
+    config.asUnsafe[Users]("users") should be (Map("user1" -> user1, "user2" -> user2))
+  }
+
+  "Map reader" should "be able to read nested collapsed Map with Ints" in {
+    val config = ConfigFactory.parseString(
+      """
+        |users = {
+        |  user1 {
+        |    key11.subkey1 = 11
+        |    key12.subkey2 = 12
+        |  }
+        |  user2 {
+        |    key21.subkey1 = 21
+        |    key22.subkey2 = 22
+        |  }
+        |}
+      """.stripMargin)
+
+    val user1 = Map("key11.subkey1" -> 11, "key12.subkey2" -> 12)
+    val user2 = Map("key21.subkey1" -> 21, "key22.subkey2" -> 22)
+
+    type Users = Map[String, Map[String, Int]]
+
+    config.asUnsafe[Users]("users") should be (Map("user1" -> user1, "user2" -> user2))
+  }
+
+  "Map reader" should "be able to read nested collapsed Map with AnyVals" in {
+    val config = ConfigFactory.parseString(
+      """
+        |users = {
+        |  user1 {
+        |    key11.subkey1 = value1
+        |    key12.subkey2 = value2
+        |  }
+        |  user2 {
+        |    key21.subkey1 = value1
+        |    key22.subkey2 = value2
+        |  }
+        |}
+      """.stripMargin)
+
+    val sv = StringValue
+    val user1 = Map("key11.subkey1" -> sv("value1"), "key12.subkey2" -> sv("value2"))
+    val user2 = Map("key21.subkey1" -> sv("value1"), "key22.subkey2" -> sv("value2"))
+
+    type Users = Map[String, Map[String, StringValue]]
+
+    config.asUnsafe[Users]("users") should be (Map("user1" -> user1, "user2" -> user2))
   }
 
   "Config object" should "be directly convert to Map" in {

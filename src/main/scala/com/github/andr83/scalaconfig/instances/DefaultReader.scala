@@ -70,12 +70,14 @@ trait DefaultReader {
     }
   })
 
-  implicit def mapReader[A: Reader]: Reader[Map[String, A]] = Reader.pureV((config: Config, path: String) => {
+  def mapReader[A: Reader](collapsed: Boolean): Reader[Map[String, A]] = Reader.pureV((config: Config, path: String) => {
     val reader = implicitly[Reader[A]]
     val obj = config.getConfig(path)
-    val (errors, res) = obj.entrySet().asScala.map(e => {
+    val entries = if (collapsed) obj.entrySet() else obj.root().entrySet()
+    val (errors, res) = entries.asScala.map(e => {
       val entryConfig = e.getValue.atPath(FakePath)
-      e.getKey.stripPrefix("\"").stripSuffix("\"") -> reader(entryConfig, FakePath)
+      val key = if (collapsed) e.getKey.stripPrefix("\"").stripSuffix("\"") else e.getKey
+      key -> reader(entryConfig, FakePath)
     }).partition(_._2.isLeft)
     if (errors.nonEmpty) {
       Left(errors.flatMap(_._2.left.get).toSeq)
@@ -86,6 +88,11 @@ trait DefaultReader {
       }.toMap)
     }
   })
+
+  implicit def mapReaderGeneric[A: Reader]: Reader[Map[String, A]] = mapReader(collapsed = false)
+  implicit def mapReaderAnyVal[A <: AnyVal : Reader]: Reader[Map[String, A]] = mapReader(collapsed = true)
+  implicit def mapReaderString: Reader[Map[String, String]] = mapReader(collapsed = true)
+  implicit def mapReaderInt: Reader[Map[String, Int]] = mapReader(collapsed = true)
 
   implicit val mapStringAnyReader: Reader[Map[String, AnyRef]] = Reader.pure((config: Config, path: String) => {
     val obj = config.getConfig(path)
