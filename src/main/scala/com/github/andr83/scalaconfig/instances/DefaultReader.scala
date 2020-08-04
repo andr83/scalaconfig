@@ -6,7 +6,7 @@ import com.github.andr83.scalaconfig.{FakePath, Reader}
 import com.typesafe.config.{Config, ConfigValue}
 
 import scala.collection.JavaConverters._
-import scala.collection.generic.CanBuildFrom
+import scala.collection.compat._
 import scala.concurrent.duration.{FiniteDuration, NANOSECONDS}
 import scala.language.higherKinds
 
@@ -48,7 +48,7 @@ trait DefaultReader {
     }
   })
 
-  implicit def traversableReader[A: Reader, C[_]](implicit cbf: CanBuildFrom[Nothing, A, C[A]]): Reader[C[A]] = Reader.pureV((config: Config, path: String) => {
+  implicit def traversableReader[A: Reader, C[_]](implicit factory: Factory[A, C[A]]): Reader[C[A]] = Reader.pureV((config: Config, path: String) => {
     val reader = implicitly[Reader[A]]
     val list = config.getList(path).asScala
 
@@ -58,9 +58,9 @@ trait DefaultReader {
     }) partition (_.isLeft)
 
     if (errors.nonEmpty) {
-      Left(errors.flatMap(_.left.get))
+      Left(errors.flatMap(_.left.get).toSeq)
     } else {
-      val builder = cbf()
+      val builder = factory.newBuilder
       builder.sizeHint(list.size)
       res.foreach {
         case Right(a) => builder += a
