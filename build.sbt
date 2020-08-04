@@ -7,9 +7,9 @@ val scalaconfig = project
     organization := "com.github.andr83",
     name := "scalaconfig",
     version := "0.6-SNAPSHOT",
-    scalaVersion := "2.12.8",
+    scalaVersion := "2.13.3",
     scalacOptions += "-Xlog-implicits",
-    crossScalaVersions := Seq("2.10.6", "2.11.0", "2.12.0"),
+    crossScalaVersions := Seq("2.11.12", "2.12.12", "2.13.3"),
     isSnapshot := version.value.endsWith("-SNAPSHOT"),
     scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),
     resolvers ++= Seq(
@@ -35,10 +35,22 @@ val scalaconfig = project
     pomIncludeRepository := { _ => false },
     libraryDependencies ++= Seq(
       Library.typesafeConfig % "provided",
+      Library.scalaCollectionCompat,
       Library.scalaTest % "test",
-      Library.shapeless,
-      compilerPlugin(Library.scalaMacrosParadise cross CrossVersion.full)
+      Library.shapeless
     ),
+    Compile / scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, n)) if n >= 13 => "-Ymacro-annotations" :: Nil
+        case _ => Nil
+      }
+    },
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, n)) if n >= 13 => Nil
+        case _ => compilerPlugin(Library.scalaMacrosParadise cross CrossVersion.full) :: Nil
+      }
+    },
     pomExtra := {
       <url>https://github.com/andr83/scalaconfig</url>
       <licenses>

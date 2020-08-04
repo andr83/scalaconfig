@@ -3,14 +3,16 @@ package com.github.andr83.scalaconfig
 import java.util.Properties
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigValue, ConfigValueType}
-import org.scalatest.{FlatSpec, Inside, Matchers}
+import org.scalatest.Inside
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 
 /**
   * @author andr83
   */
-class ReaderSpec extends FlatSpec with Matchers with Inside {
+class ReaderSpec extends AnyFlatSpec with Matchers with Inside {
 
   "String value reader" should "read string" in {
     val config = ConfigFactory.parseString(s"stringField = SomeString")
@@ -21,7 +23,7 @@ class ReaderSpec extends FlatSpec with Matchers with Inside {
   "String value" should "be read as symbol also" in {
     val config = ConfigFactory.parseString(s"stringField = SomeString")
 
-    config.asUnsafe[Symbol]("stringField") should equal('SomeString)
+    config.asUnsafe[Symbol]("stringField") should equal(Symbol("SomeString"))
   }
 
   "Int value reader" should "read int" in {
