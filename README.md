@@ -4,10 +4,10 @@
 [![codecov](https://codecov.io/gh/andr83/scalaconfig/branch/master/graph/badge.svg)](https://codecov.io/gh/andr83/scalaconfig)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.andr83/scalaconfig_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.andr83/scalaconfig_2.11)
 
-ScalaConfig is a lightweight wrapper over Typesafe Config library provides scala friendly access. 
+ScalaConfig is a lightweight wrapper over ~~Typesafe~~ Lightbend Config library provides scala friendly access. 
 It is implemented with type classes pattern and use shapeless for reading case classes.
 
-> Current documentation is a actual for 0.4 version.
+> Current documentation is a actual for 0.7 version.
 
 ScalaConfig adds additional metods:
 
@@ -85,17 +85,18 @@ https://andr83.io/en/1384/
 ### Latest release.
 
 ```scala
-// for >= Scala 2.10.6, 2.11.x, 2.12.x
-libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.4"
+// for >= Scala 2.11.x, 2.12.x, 2.13.x
+libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.7"
 ```
+
+If you want scala 2.10 support please use 0.4 version. 
 
 ### Develop branch.
 
 ```scala
 resolvers += Resolver.sonatypeRepo("snapshots")
 
-// for >= Scala 2.10.6, 2.11.x, 2.12.x
-libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.5-SNAPSHOT"
+libraryDependencies += "com.github.andr83" %% "scalaconfig" % "0.8-SNAPSHOT"
 ```
 
 ## License
